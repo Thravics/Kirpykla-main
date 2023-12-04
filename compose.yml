@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  caddy:
+    image: caddy
+    container_name: caddy
+    restart: unless-stopped
+    volumes: 
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "80:80"
+    networks:
+      - net1
+      - net2
+
+  vhost1:
+    container_name: vhost1
+    restart: unless-stopped
+    build:
+      context: ./vhost1
+      dockerfile: Dockerfile
+    image: php:apache
+    volumes:
+      - ./svetainek:/var/www/html
+    networks:
+      - net1
+      - net2
+
+  database:
+    container_name: database
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    environment: 
+      MYSQL_ROOT_PASSWORD: "rootpassword"
+      MYSQL_DATABASE: "mydb"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+    ports:
+      - "4444:3306"
+    networks:
+      - net1
+      - net2
+
+  startup: 
+    container_name: startup
+    command: sleep infinity
+    build:
+      context: ./startup
+      dockerfile: Dockerfile
+    volumes:
+      - ./startup:/opt
+      - //var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  net1:
+  net2:

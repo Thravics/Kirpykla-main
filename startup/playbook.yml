@@ -1,0 +1,28 @@
+- name: Main playbook
+  hosts: localhost
+  gather_facts: true
+  tasks:
+  - name: update apt cache
+    community.docker.docker_container_exec:
+      container: vhost1
+      command: apt-get update
+
+  - name: install wget curl
+    community.docker.docker_container_exec:
+      container: vhost1
+      command: apt-get install -y wget curl unzip
+    register: result 
+
+  # - name: download wordpress
+  #   community.docker.docker_container_exec:
+  #     container: vhost1
+  #     command: wget -O /tmp/latest.zip https://wordpress.org/latest.zip
+
+  # - name: extract wordpress to /var/www/html
+  #   community.docker.docker_container_exec:
+  #     container: vhost1
+  #     command: unzip /tmp/latest.zip -d /var/www/html
+
+  - name: status of install
+    ansible.builtin.debug:
+      msg: "{{ result }}"
